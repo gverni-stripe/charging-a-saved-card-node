@@ -34,30 +34,36 @@ const calculateOrderAmount = (_) => {
 // An endpoint to charge a saved card
 // In your application you may want a cron job / other internal process
 app.post('/charge-card-off-session', async (req, res) => {
-  let paymentIntent, customer
+  let paymentIntent
+  let { paymentMethod, customer } = req.body
   try {
-    // You need to attach the PaymentMethod to a Customer in order to reuse
-    // Since we are using test cards, create a new Customer here
-    // You would do this in your payment flow that saves cards
-    customer = await stripe.customers.create({
-      payment_method: req.body.paymentMethod,
-    })
+    if (!customer) {
+      // You need to attach the PaymentMethod to a Customer in order to reuse
+      // Since we are using test cards, create a new Customer here
+      // You would do this in your payment flow that saves cards
+      customer = await stripe.customers.create({
+        payment_method: paymentMethod,
+      })
 
-    // List the customer's payment methods to find one to charge
-    const paymentMethods = await stripe.paymentMethods.list({
-      customer: customer.id,
-      type: 'card',
-    })
+      // List the customer's payment methods to find one to charge
+      const paymentMethods = await stripe.paymentMethods.list({
+        customer: customer.id,
+        type: 'card',
+      })
+
+      paymentMethod = paymentMethods.data[0].id
+    }
 
     // Create and confirm a PaymentIntent with the order amount, currency,
     // Customer and PaymentMethod ID
     paymentIntent = await stripe.paymentIntents.create({
       amount: calculateOrderAmount(),
       currency: 'usd',
-      payment_method: paymentMethods.data[0].id,
-      customer: customer.id,
+      payment_method: paymentMethod,
+      customer: customer,
       off_session: true,
       confirm: true,
+      payment_method_options: { card: { request_three_d_secure: 'any' } },
     })
 
     res.send({
@@ -95,6 +101,42 @@ app.post('/charge-card-off-session', async (req, res) => {
       console.log('Unknown error occurred', err)
     }
   }
+})
+
+app.get('/customer-payment-methods', async (req, res) => {
+  const customerId = req.query.id
+  console.log(customerId)
+  if (!customerId) {
+    console.log('No customer Id provided')
+    res.send({})
+    return
+  }
+
+  const paymentMethods = await stripe.paymentMethods.list({
+    customer: customerId,
+    type: 'card',
+  })
+
+  if (!paymentMethods) {
+    console.log('No payment methods found for the given customer')
+    res.send({})
+    return
+  }
+
+  console.log(paymentMethods.data[0].id)
+  res.send(
+    paymentMethods.data.map((pm) => ({
+      id: pm.id,
+      brand: pm.card.brand,
+      exp: `${pm.card.exp_month}/${pm.card.exp_year}`,
+      last4: pm.card.last4,
+    }))
+  )
+})
+
+app.get('/test', (req, res) => {
+  console.log('Test endpoint')
+  res.send('Hello')
 })
 
 // Expose a endpoint as a webhook handler for asynchronous events.
