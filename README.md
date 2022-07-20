@@ -1,5 +1,9 @@
 # Charging a saved card
 
+This repo is a fork of the nodeJS version of [charging-a-saved-card](https://github.com/stripe-samples/charging-a-saved-card). The additional functionlities, allows to fetch an existing card associated to a customer. 
+
+![image](https://user-images.githubusercontent.com/95485729/179969389-a5fcd2a1-3690-41e9-aa20-e30ccc25f987.png)
+
 When you create a PaymentIntent with a saved card there's a risk that the card will be declined or require authentication.
 You should build a recovery flow to prompt your customer to either authenticate the purchase or provide new payment details.
 
