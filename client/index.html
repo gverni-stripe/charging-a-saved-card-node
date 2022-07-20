@@ -23,19 +23,25 @@
               recovery flow
             </label>
             <select class="sr-select" id="pm-type">
-              <option value="pm_card_authenticationRequired"
-                >Card fails because it requires customer authentication</option
-              >
+              <option value="pm_card_chooseSaved">Pick a saved card</option>
+              <option value="pm_card_authenticationRequired">
+                Card fails because it requires customer authentication
+              </option>
               <option
                 value="pm_card_chargeCustomerFail"
-                style="background-image:url(images/card-blocked.svg);width:10px;"
-                >Card fails due to insufficient funds</option
+                style="
+                  background-image: url(images/card-blocked.svg);
+                  width: 10px;
+                "
               >
+                Card fails due to insufficient funds
+              </option>
               <option
                 value="pm_card_authenticationRequiredSetupForOffSession"
-                style="background-image:url(images/card-success.svg);"
-                >Card succeeds</option
+                style="background-image: url(images/card-success.svg)"
               >
+                Card succeeds
+              </option>
             </select>
           </div>
           <button id="submit" type="submit">
@@ -43,6 +49,29 @@
             <span class="button-text">Charge</span>
           </button>
         </form>
+        <!--Use a saved card -->
+        <div class="sr-result saved-card hidden">
+          <div class="sr-result-container">
+            <label for="customer-id">Provide your customer id</label>
+            <input type="text" name="" id="customer-id" />
+          </div>
+          <button id="fetch-saved-cards">
+            <div class="spinner hidden"></div>
+            <span class="button-text">Search Payment Methods</span>
+          </button>
+        </div>
+
+        <div class="sr-result saved-card-choose hidden">
+          <div class="sr-result-container">
+            <label for="saved-cards-select">Select your card</label>
+            <select class="sr-select" id="saved-cards-select"></select>
+          </div>
+          <button id="saved-card-pay">
+            <div class="spinner hidden"></div>
+            <span class="button-text">Pay with this payment method</span>
+          </button>
+        </div>
+
         <!-- View to ask customer to authenticate a specific card -->
         <div class="sr-result requires-auth hidden">
           <div class="sr-result-container">
@@ -69,9 +98,7 @@
               src="./images/card-blocked.svg"
               alt="Credit card image with a blocking icon"
             />
-            <p>
-              Your card was declined, please provide a new payment method.
-            </p>
+            <p>Your card was declined, please provide a new payment method.</p>
           </div>
           <div id="card-element"></div>
           <div class="sr-field-error"></div>
