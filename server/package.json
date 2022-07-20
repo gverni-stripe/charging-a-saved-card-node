@@ -4,7 +4,7 @@
   "description": "How to charge a saved card off-session",
   "main": "index.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "@adreyfus-stripe",
@@ -13,6 +13,7 @@
     "body-parser": "^1.19.0",
     "dotenv": "^8.0.0",
     "express": "^4.17.1",
+    "nodemon": "^2.0.19",
     "stripe": "^7.1.0"
   }
 }
